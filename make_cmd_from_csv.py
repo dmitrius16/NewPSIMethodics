@@ -45,7 +45,7 @@ def MenuItems():
 
 def HandleMenu(pnts_for_generator):
     with open(r".\out.txt", "w") as outfile,\
-    open(serial.Serial('COM3', 19200, timeout=1, parity=serial.PARITY_NONE, rtscts=1)) as ser:
+    serial.Serial('COM5', 19200, timeout=1, parity=serial.PARITY_NONE, rtscts=1) as ser:
         while(True):
             try:
                 menu_item = int(input())
@@ -55,8 +55,9 @@ def HandleMenu(pnts_for_generator):
                     num_pnt = int(input("Enter point number "))
                     pnt_param = pnts_for_generator.get(num_pnt)
                     if pnt_param:
-                        res = MTE_parameters.generate_commands(pnt_param)
-                        ser.write(res)
+                        # res = MTE_parameters.generate_commands(pnt_param)
+                        res = MTE_parameters.generate_commands_with_harm(pnt_param)
+                        ser.write(res.encode(encoding="utf-8"))
                         rd_ser = ser.read(300)
                         outfile.write(res)
                         print(rd_ser)
@@ -72,7 +73,7 @@ def main():
     if len(sys.argv) < 3:
         print("Need more cmd arguments! 1 - name csv, 2 - number of point")
         return     
-    generator_points_dict = collections.OrderedDict()
+    # generator_points_dict = collections.OrderedDict()
     set_pnts_for_PSI = create_dict_test_points(sys.argv[1])
     
     MenuItems()
