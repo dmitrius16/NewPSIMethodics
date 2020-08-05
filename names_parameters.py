@@ -22,5 +22,8 @@ def get_csv_parameters_names():
     parameter_names.append(tmp)
     return parameter_names
 
+def get_names_harm_vector():
+    return ("Ua", "Ub", "Uc", "Ia", "Ib", "Ic")
+
 if __name__ == "__main__":
     pass

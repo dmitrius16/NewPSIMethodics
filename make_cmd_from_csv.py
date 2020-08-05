@@ -6,24 +6,18 @@ import csv
 import collections
 import MTE_parameters
 import names_parameters
+from test_point_signal import Signal
 import serial
-def generate_vector_param(csv_map_dict):
-    """From row csv generate parameters dict for Generator (MTE or Resource)
-    csv_map_dict - dict from csv file"""
 
-    # vec_param = collections.OrderedDict()
-    # vec_param["F"] = csv_map_dict["F"]
-    # Ua = MTE_parameters.Voltage(csv_map_dict["Ua"], 0) # Ua alltime has phase 0
-    # Ub = MTE_parameters.Voltage(csv_map_dict["Ub"], csv_map_dict["Phi_Uab"])
-    # Uc = MTE_parameters.Voltage(csv_map_dict["Uc"], csv_map_dict["Phi_Uac"])
+def make_signal_from_csv_source(txt_par_dict, num_pnt):
+    '''
+
+    '''
+    freq = float(txt_par_dict["F"])
+    signal = Signal(freq)
     
-    # vec_param["Ua"] = Ua
-    # vec_param["Ub"] = Ub 
-    # vec_param["Uc"] = Uc 
-    # vec_param["Ia"] = MTE_parameters.Current(Ua, csv_map_dict["Ia"], csv_map_dict["Phi_A"])
-    # vec_param["Ib"] = MTE_parameters.Current(Ub, csv_map_dict["Ib"], csv_map_dict["Phi_B"])
-    # vec_param["Ic"] = MTE_parameters.Current(Uc, csv_map_dict["Ic"], csv_map_dict["Phi_C"])
-    # return vec_param
+    
+
     pass
     
 def create_dict_test_points(csv_file_name):
