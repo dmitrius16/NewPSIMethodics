@@ -6,20 +6,11 @@ import csv
 import collections
 import MTE_parameters
 import names_parameters
-from test_point_signal import Signal
+import test_point_signal as tps
+
 import serial
 
-def make_signal_from_csv_source(txt_par_dict, num_pnt):
-    '''
-
-    '''
-    freq = float(txt_par_dict["F"])
-    signal = Signal(freq)
-    
-    
-
-    pass
-    
+   
 def create_dict_test_points(csv_file_name):
     """
     Read csv line by line and create dict of points
@@ -28,6 +19,9 @@ def create_dict_test_points(csv_file_name):
     with(open(csv_file_name, 'r')) as csv_file:
         reader = csv.DictReader(csv_file, fieldnames = names_parameters.get_csv_parameters_names(), delimiter=";")
         for num_pnt, pnt_param in enumerate(reader):
+            #for el in pnt_param:
+                #pnt_param[el] = pnt_param[el].replace(",",".") if type(pnt_param[el]) == 'str'
+            pnt_param = {k:v.replace(",", ".") if type(v) == str else v for k, v in pnt_param.items()}
             res_dict[num_pnt + 1] = pnt_param
     return res_dict
 
@@ -52,7 +46,7 @@ def HandleMenu(pnts_for_generator):
                         # res = MTE_parameters.generate_commands(pnt_param)
                         res = MTE_parameters.generate_commands_with_harm(pnt_param)
                         ser.write(res.encode(encoding="utf-8"))
-                        rd_ser = ser.read(300)
+                        rd_ser = ser.read(1000)
                         outfile.write(res)
                         print(rd_ser)
                     else:
@@ -60,7 +54,7 @@ def HandleMenu(pnts_for_generator):
                 elif menu_item == 2:
                     outfile.write("R\r")
             except ValueError:
-                print("Something go wrong! input num menu item.")
+                print("Something goes wrong! input num menu item.")
 
 
 def main():
@@ -69,7 +63,7 @@ def main():
         return     
     # generator_points_dict = collections.OrderedDict()
     set_pnts_for_PSI = create_dict_test_points(sys.argv[1])
-    
+    sig = tps.make_signal_from_csv_source(set_pnts_for_PSI, 132) 
     MenuItems()
     HandleMenu(set_pnts_for_PSI)
 

@@ -40,6 +40,7 @@ def generate_commands_with_harm(vec_par):
     str_cmd.append(__generate_base_signal_command(vec_par))
     str_cmd.append(__generate_harm_cmd(vec_par, "OWU", "Uh", "Phi_U_"))
     str_cmd.append(__generate_harm_cmd(vec_par, "OWI", "Ih", "Phi"))
+    str_cmd.append("SET\r")
     return "\r".join(str_cmd)
     
     
@@ -56,7 +57,8 @@ def __generate_base_signal_command(vec_par):
             ("I1,", vec_par["Ia"]), ("W1,", vec_par["Phi_A"]),
             ("I2,", vec_par["Ib"]), ("W2,", vec_par["Phi_B"]),
             ("I3,", vec_par["Ic"]), ("W3,", vec_par["Phi_C"]))
-    str_cmd = '\r'.join((''.join((el[0], el[1].replace(",", "."))) for el in cmds))
+    #  str_cmd = ';'.join((''.join((el[0], el[1].replace(",", "."))) for el in cmds))
+    str_cmd = ';'.join((''.join((el[0], el[1])) for el in cmds))
     return str_cmd
 
 def __generate_harm_cmd(vec_par, cmd_name, prefix_harm, prefix_harm_phi):
