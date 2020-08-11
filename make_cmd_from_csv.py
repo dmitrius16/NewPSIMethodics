@@ -8,6 +8,8 @@ import MTE_parameters
 import names_parameters
 import test_point_signal as tps
 
+import test_parsing_answer  # clear it in the future
+
 import serial
 
    
@@ -64,6 +66,14 @@ def main():
     # generator_points_dict = collections.OrderedDict()
     set_pnts_for_PSI = create_dict_test_points(sys.argv[1])
     sig = tps.make_signal_from_csv_source(set_pnts_for_PSI, 132) 
+    
+    Ua_from_MTE = test_parsing_answer.parse_MTE_Counter_answer()
+    Ub_from_MTE = test_parsing_answer.parse_MTE_Counter_answer()
+    Uc_from_MTE = test_parsing_answer.parse_MTE_Counter_answer()
+
+     
+
+    print(sig.calc_phase_voltage("Ua"), sig.calc_phase_voltage("Ub"), sig.calc_phase_voltage("Uc"))
     MenuItems()
     HandleMenu(set_pnts_for_PSI)
 

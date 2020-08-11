@@ -5,9 +5,9 @@ import names_parameters as names_par
 import numpy as np
 class VectorValues:
     def __init__(self):
-        #self.storage = dict(zip(get_names_harm_vector(), ((0, 0),) * 6 ))
         self.storage = dict()
         self.storage.fromkeys(names_par.get_names_vector(), (0, 0))
+    
     def set(self, name, ampl, phase_grad):
         '''
         name_param: string with name param. Valid names: Ua, Ub, Uc, Ia, Ib, Ic
@@ -19,10 +19,20 @@ class VectorValues:
     
     def get(self, name):
         '''
-        get - return pair amplitude, phase of given name
+        get - return pair (amplitude, phase) of given name
         '''
         return self.storage[name]
-
+    def get_ampl(self, name):
+        '''
+        get_ampl - return rms value signal
+        '''
+        return self.storage[name][0]
+    def get_phase(self, name):
+        '''
+        get_phase - return phase signal
+        '''
+        return self.storage[name][1]
+    
 
 class Signal:
     '''
@@ -52,13 +62,28 @@ class Signal:
         '''
         self.set_interharmonics[num_interharm]
 
+    def add_MTE_counter_results(self, name, mte_phaseA, mte_phaseB, mte_phaseC):
+        '''
+        Create signal from mte counter results. MTE add every phases separately
+        MTE has only harmonics! no interharmonics 
+        '''
+        if self.set_harmonics.get(0, default=None) is not None:
+            pass
+        else:
+            for harm in range(0, 51):  # create 50 VectorValues harmonics 
+                pass
+
+
+
     def calc_phase_voltage(self, name="Ua"):
         '''
         calc_phase_voltage - calc rms voltage U = sqrt(U2^2 + U2^2 + ...)
         '''
-        if name in names_par.get_phase_vltg_names():
-            pass
-        return 0
+        if name in names_par.get_phase_voltage_names():
+            voltage = 0
+            for vec_val in self.set_harmonics.values():
+                voltage += vec_val.get_ampl(name) ** 2
+        return voltage ** 0.5
     
 
     def calc_linear_voltage(self, name="Uab"):
@@ -105,7 +130,7 @@ def make_signal_from_csv_source(txt_par_dict, num_pnt):
     # put interharmonics into signal. Notice!!! current csv scenary don't have phase shift on interharmonics!!!
     for inter_harm in names_par.get_voltage_interharmonic_names():
         ui_name, ii_name = inter_harm
-        if par[ui_name] != '0' or par[ii_name] != 0:
+        if par[ui_name] != '0' or par[ii_name] != '0':
             harm = VectorValues()
             val_ui = float(par[ui_name])
             for name in names_par.get_phase_voltage_names():
@@ -113,7 +138,7 @@ def make_signal_from_csv_source(txt_par_dict, num_pnt):
             val_ii = float(par[ii_name])
             for name in names_par.get_phase_current_names():
                 harm.set(name, val_ii, 0)
-            signal.add_harm(names_par.get_num_harm(ui_name), harm)
+            signal.add_interharm(names_par.get_num_harm(ui_name), harm)
 
     return signal
  
