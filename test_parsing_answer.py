@@ -2,8 +2,8 @@
 Functions from Alexey
 '''
 import math
-import get_common_params_Counter
-import get_common_params_Generator
+import debug_func.get_common_params_Counter
+import debug_func.get_common_params_Generator
 
 test_gen_vltg_str = "RSU1=1,-8.1596E-1+0.0000E+0-5.8515E+3-1.4906E+4-4.8632E-1+2.2096E+0+3.0670E-1\
 +3.2926E+0-6.1154E-1+5.1914E-1-1.1498E+3+3.5535E+2+1.5143E+0-2.4576E+0\

@@ -10,7 +10,7 @@ class VectorValues:
     
     def set(self, name, ampl, phase_grad):
         '''
-        name_param: string with name param. Valid names: Ua, Ub, Uc, Ia, Ib, Ic
+        name: string with name param. Valid names: Ua, Ub, Uc, Ia, Ib, Ic
         ampl: signal amplitude
         phase_grad: signal phase
         '''
@@ -62,19 +62,19 @@ class Signal:
         '''
         self.set_interharmonics[num_interharm]
 
-    def add_MTE_counter_results(self, name, mte_phaseA, mte_phaseB, mte_phaseC):
+    def add_MTE_counter_harm_results(self, *args):
         '''
         Create signal from mte counter results. MTE add every phases separately
-        MTE has only harmonics! no interharmonics 
+        MTE has only harmonics! no interharmonics
+        args - set ziped values for each phase args[0] -> Ua, args[1] -> Ub... , args[5] ->Ic, where Ua ->((val, phase),(val_1, phase_1)....)
         '''
-        if self.set_harmonics.get(0, default=None) is not None:
-            pass
-        else:
-            for harm in range(0, 51):  # create 50 VectorValues harmonics 
-                pass
-
-
-
+        Ua, Ub, Uc, Ia, Ib, Ic = args
+        names = names_par.get_names_vector()
+        for num_harm in range(0, 32):
+            harm_val = VectorValues()
+            for ind in range(len(args)):
+                harm_val.set(names[ind], args[ind][0], args[ind][1])  # args[ind][0] - val, args[ind][1] - phase
+            
     def calc_phase_voltage(self, name="Ua"):
         '''
         calc_phase_voltage - calc rms voltage U = sqrt(U2^2 + U2^2 + ...)
