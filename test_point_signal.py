@@ -73,7 +73,7 @@ class Signal:
         for num_harm in range(0, 32):
             harm_val = VectorValues()
             for ind in range(len(args)):
-                harm_val.set(names[ind], args[ind][0], args[ind][1])  # args[ind][0] - val, args[ind][1] - phase
+                harm_val.set(names[ind], args[ind][0], args[ind][1])  # args[ind][0] - amplitude, args[ind][1] - phase
             
     def calc_phase_voltage(self, name="Ua"):
         '''
