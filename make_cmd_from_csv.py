@@ -6,7 +6,7 @@ import csv
 import collections
 import MTE_parameters
 import names_parameters
-import test_point_signal as tps
+import vector_signal as vs
 
 import test_parsing_answer  # clear it in the future
 
@@ -65,7 +65,7 @@ def main():
         return     
     # generator_points_dict = collections.OrderedDict()
     set_pnts_for_PSI = create_dict_test_points(sys.argv[1])
-    sig = tps.make_signal_from_csv_source(set_pnts_for_PSI, 132) 
+    sig = vs.make_signal_from_csv_source(set_pnts_for_PSI, 132) 
     
     Ua_from_MTE = test_parsing_answer.parse_MTE_Counter_answer()
     Ub_from_MTE = test_parsing_answer.parse_MTE_Counter_answer()
