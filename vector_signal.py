@@ -42,6 +42,7 @@ class Signal:
         self.frequency = freq
         self.set_harmonics = dict()
         self.set_interharmonics = dict()
+        self.meas_result = dict.fromkeys(names_par.names_measured_params, 0)
     def add(self, vector_values):
         '''
         add main frequency vector values
@@ -60,7 +61,7 @@ class Signal:
         add interharmonics to signal
         vvector_values - type VectorValues from test_point_signal.py
         '''
-        self.set_interharmonics[num_interharm]
+        self.set_interharmonics[num_interharm] = vector_values
 
     def add_MTE_counter_harm_results(self, *args):
         '''
@@ -74,16 +75,56 @@ class Signal:
             harm_val = VectorValues()
             for ind in range(len(args)):
                 harm_val.set(names[ind], args[ind][0], args[ind][1])  # args[ind][0] - amplitude, args[ind][1] - phase
-            
-    def calc_phase_voltage(self, name="Ua"):
+
+
+    def __calc_rms_value(self, name="vltg"):
         '''
-        calc_phase_voltage - calc rms voltage U = sqrt(U2^2 + U2^2 + ...)
+        __calc_rms_value - calculate rms value voltage or current depending on the name  U = sqrt(U2^2 + U3^2 + ...) or I = sqrt ...
+
+        valid value for name 'vltg' or 'current'
         '''
-        if name in names_par.get_phase_voltage_names():
-            voltage = 0
+        res = []
+        phase_names = names_par.get_phase_voltage_names() if name == 'vltg' else names_par.get_phase_current_names() 
+        for name in phase_names:
+            value = 0
             for vec_val in self.set_harmonics.values():
-                voltage += vec_val.get_ampl(name) ** 2
-        return voltage ** 0.5
+                value += vec_val.get_ampl(name) ** 2
+            res.append(value ** 0.5)
+        self.meas_result.update({nm_phase: value for nm_phase, value in zip(phase_names, res)})
+
+
+    def __calc_phase_voltage(self):
+        '''
+        calc_phase_voltage - calc rms voltage U = sqrt(U2^2 + U3^2 + ...)
+        '''
+        self.__calc_rms_value(name="vltg") 
+
+
+    def __calc_voltage_angles(self):
+        '''
+        calc angles between phases.
+        '''
+        nm_angles = names_par.get_measured_vltg_angle_names()
+        phiB = self.set_harmonics[0].get_phase("Ub")
+        phiC = self.set_harmonics[0].get_phase("Uc")
+        sign = 0
+        if phiB - phiC > 0:
+            sign = 1
+        elif phiB - phiC < 0:
+            sign = -1
+
+        angle_Uab = 0 - phiB
+        angle_Ubc = phiB - phiC if np.abs(phiB - phiC) < 180 else phiB - phiC - 360 * sign
+        angle_Uca = phiC
+
+        self.meas_result.update({angle: val for angle, val in zip(nm_angles, (angle_Uab, angle_Ubc, angle_Uca))})
+
+    
+    def __calc_phase_current(self):
+        '''
+        calc_phase_current - calc rms current I = sqrt(I2^2 + I3^2 + ...)
+        '''
+        self.__calc_rms_value(name="current")
     
 
     def calc_linear_voltage(self, name="Uab"):
@@ -96,6 +137,19 @@ class Signal:
             
         return 0
 
+    def calc_measured_param(self):
+        '''
+        calc all measurement parameters from signal
+        '''
+        self.meas_result["f"] = self.frequency
+        self.__calc_phase_voltage()
+        self.__calc_voltage_angles()
+        self.__calc_phase_current()
+
+
+    
+
+
 def make_signal_from_csv_source(txt_par_dict, num_pnt):
     '''
 
@@ -104,42 +158,44 @@ def make_signal_from_csv_source(txt_par_dict, num_pnt):
     freq = float(par["F"])
     signal = Signal(freq)
     main_freq_signal = VectorValues()
-    main_freq_signal.set("Ua", float(par["Ua"]), 0)
-    main_freq_signal.set("Ub", float(par["Ub"]), float(par["Phi_Uab"]))   # ??? phase correct ???
-    main_freq_signal.set("Uc", float(par["Uc"]), float(par["Phi_Uac"]))
-    main_freq_signal.set("Ia", float(par["Ia"]), float(par["Phi_A"]))
-    main_freq_signal.set("Ib", float(par["Ib"]), float(par["Phi_B"]))
-    main_freq_signal.set("Ic", float(par["Ic"]), float(par["Phi_C"]))
+
+    nominals = (float(par["Ua"]), float(par["Ub"]), float(par["Uc"]), float(par["Ia"]), float(par["Ib"]), float(par["Ic"]))
+
+    main_freq_signal.set("Ua", nominals[0], 0)
+    main_freq_signal.set("Ub", nominals[1], float(par["Phi_Uab"]))   # ??? phase correct ???
+    main_freq_signal.set("Uc", nominals[2], float(par["Phi_Uac"]))
+    main_freq_signal.set("Ia", nominals[3], float(par["Phi_A"]))
+    main_freq_signal.set("Ib", nominals[4], float(par["Phi_B"]))
+    main_freq_signal.set("Ic", nominals[5], float(par["Phi_C"]))
     signal.add(main_freq_signal)
+
+     
 
     # put harmonics into signal    
     for harm in names_par.get_voltage_harmonic_names():
         uh_name, ih_name, phi_name_uh, phi_name_ih = harm
-        if par[uh_name] != '0' or par[ih_name] != '0':  #  check if Uh<num> != 0 or Ih != 0 for add harmonic to signal
-            harm = VectorValues()
-            val_uh, val_phi_uh = float(par[uh_name]), float(par[phi_name_uh])  # 3 phases have identical values
-            for name in names_par.get_phase_voltage_names():
-                harm.set(name, val_uh, val_phi_uh)
+        harm = VectorValues()
+        percent_uh, phi_uh = float(par[uh_name]), float(par[phi_name_uh])  # 3 phases have identical values
+        for ind, name in enumerate(names_par.get_phase_voltage_names()):
+            harm.set(name, nominals[ind] * percent_uh / 100, phi_uh)
 
-            val_ih, val_phi_ih = float(par[ih_name]), float(par[phi_name_ih])
-            for name in names_par.get_phase_current_names():
-                harm.set(name, val_ih, val_phi_ih)
+        percent_ih, phi_ih = float(par[ih_name]), float(par[phi_name_ih])
+        for ind, name in enumerate(names_par.get_phase_current_names()):
+            harm.set(name, nominals[3 + ind] * percent_ih / 100, phi_ih)
             
-            signal.add_harm(names_par.get_num_harm(uh_name) ,harm)
+        signal.add_harm(names_par.get_num_harm(uh_name), harm)
     
     # put interharmonics into signal. Notice!!! current csv scenary don't have phase shift on interharmonics!!!
     for inter_harm in names_par.get_voltage_interharmonic_names():
         ui_name, ii_name = inter_harm
-        if par[ui_name] != '0' or par[ii_name] != '0':
-            harm = VectorValues()
-            val_ui = float(par[ui_name])
-            for name in names_par.get_phase_voltage_names():
-                harm.set(name, val_ui, 0)
-            val_ii = float(par[ii_name])
-            for name in names_par.get_phase_current_names():
-                harm.set(name, val_ii, 0)
-            signal.add_interharm(names_par.get_num_harm(ui_name), harm)
-
+        harm = VectorValues()
+        percent_ui = float(par[ui_name])
+        for ind, name in enumerate(names_par.get_phase_voltage_names()):
+            harm.set(name, nominals[ind] * percent_ui / 100, 0)
+        percent_ii = float(par[ii_name])
+        for ind, name in enumerate(names_par.get_phase_current_names()):
+            harm.set(name, nominals[3 + ind] * percent_ii / 100, 0)
+        signal.add_interharm(names_par.get_num_harm(ui_name), harm)
     return signal
  
 
