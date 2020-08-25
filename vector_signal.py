@@ -126,6 +126,36 @@ class Signal:
         '''
         self.__calc_rms_value(name="current")
     
+    def __calc_cosPhi(self):
+        '''
+        calc_cos_phi - calc cos phi *(between U and I)
+        '''
+        nm_angles = names_par.get_measured_current_angle_names()
+        phase_angles = [self.set_harmonics[0].get_phase(name) for name in names_par.get_phase_current_names()]  # phase_angles - phiA, phiB, phiC        
+        self.meas_result.update({angle : val * 180/np.pi for angle, val in zip(nm_angles, phase_angles)})
+
+    def __convert_to_complex_num(self, vec_val):
+        '''
+        convert_to_complex_num - convers VectorValue to complex number representation
+        '''
+        names = names_par.get_phase_voltage_names()
+        res = np.zeros((3,1), dtype=complex)  # create vector zeros dimention 3x1
+        for ind, nm in enumerate(names):
+            ampl, phase = vec_val.get(nm)
+            res[ind] = np.complex(ampl * np.cos(np.deg2rad(phase), ampl * np.sin(np.deg2rad(phase))))
+        return res
+        
+
+    def __calc_symmetrical_sequences_vltg(self):
+        '''
+        calc_symmetrical_sequences_vltg - calculates U1, U2, U0
+        '''
+        alpha = np.complex(np.cos(2 * np.pi/3), np.sin(2 * np.pi/3))
+        tranform_matrix = np.array([[1, alpha, alpha ** 2], [1, alpha ** 2, alpha], [1, 1, 1]])        
+        complex_val = self.__convert_to_complex_num(self.set_harmonics[0])
+        result = tranform_matrix.dot(complex_val)
+
+
 
     def calc_linear_voltage(self, name="Uab"):
         '''
@@ -145,7 +175,8 @@ class Signal:
         self.__calc_phase_voltage()
         self.__calc_voltage_angles()
         self.__calc_phase_current()
-
+        self.__calc_cosPhi()
+        self.__calc_symmetrical_sequences_vltg()
 
     
 
