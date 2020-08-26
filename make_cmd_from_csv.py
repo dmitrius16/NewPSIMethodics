@@ -21,8 +21,6 @@ def create_dict_test_points(csv_file_name):
     with(open(csv_file_name, 'r')) as csv_file:
         reader = csv.DictReader(csv_file, fieldnames = names_parameters.get_csv_parameters_names(), delimiter=";")
         for num_pnt, pnt_param in enumerate(reader):
-            #for el in pnt_param:
-                #pnt_param[el] = pnt_param[el].replace(",",".") if type(pnt_param[el]) == 'str'
             pnt_param = {k:v.replace(",", ".") if type(v) == str else v for k, v in pnt_param.items()}
             res_dict[num_pnt + 1] = pnt_param
     return res_dict

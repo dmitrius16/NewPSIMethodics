@@ -13,14 +13,11 @@ def get_measured_vltg_angle_names():
 def get_measured_current_names():
     return names_measured_params[7:10]
 
-def get_measured_current_angle_names():
+def get_measured_cosPhi_names():
     return names_measured_params[10:13]
 
-def get_measured_vltg_sequences_names():
-    return names_measured_params[13:16]
-
-def get_measured_current_sequences_names():
-    return names_measured_params[16:19]
+def get_measured_sequences_names():
+    return names_measured_params[13:19]
 
 def get_measured_active_power_names():
     return names_measured_params[19:22]
