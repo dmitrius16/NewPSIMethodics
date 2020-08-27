@@ -40,15 +40,40 @@ class Signal:
     '''
     def __init__(self):
         self.frequency = 0
-        self.set_harmonics = dict()
-        self.set_interharmonics = dict()
-        self.meas_result = dict.fromkeys(names_par.names_measured_params, 0)
+        self.meas_result = MeasuredSignal() # dict.fromkeys(names_par.names_measured_params, 0)
+        self.set_harmonics = [VectorValues()  for _ in range(0, 50)] # create 50 Harmonics
+        self.set_interharmonics = [VectorValues() for _ in range(0, 49)] #create 49 interharmonics
+    
+    def get_main_freq_vector(self):
+        '''
+
+        '''
+        return self.set_harmonics[0]
+
+    def get_vector_harm(self, num_harm):
+        '''
+        Get vectror - return vector instance of harmonic from set harmonics
+        where num_harm - number harmonics valid number 1 - 50, where 1 - main frequency
+        '''
+        return self.set_harmonics[num_harm - 1]
+
+    def set_frequency(self, freq):
+        self.frequency = freq
+
+
+    def get_vector_interharm(self, num_interharm):
+        '''
+        Get vector interharm - return vector instance of interharmonic
+        where interharm - number interharmonic valid number 1 - 49, where 1 - first interharmonic
+        '''
+        return self.set_interharmonics[num_interharm - 1]
+
     def add(self, vector_values, freq = 50):
         '''
         add main frequency vector values
         vector_values - type VectorValues from test_point_signal.py
         '''
-        self.frequency = freq
+        # self.frequency = freq
         self.set_harmonics[0] = vector_values
 
     def add_harm(self, num_harm, vector_values):
@@ -88,10 +113,10 @@ class Signal:
         phase_names = names_par.get_phase_voltage_names() if name == 'vltg' else names_par.get_phase_current_names() 
         for name in phase_names:
             value = 0
-            for vec_val in self.set_harmonics.values():
+            for vec_val in self.set_harmonics: #.values():
                 value += vec_val.get_ampl(name) ** 2
             res.append(value ** 0.5)
-        self.meas_result.update({nm_phase: value for nm_phase, value in zip(phase_names, res)})
+        self.meas_result.update(**{nm_phase: value for nm_phase, value in zip(phase_names, res)})
 
 
     def __calc_phase_voltage(self):
@@ -118,7 +143,7 @@ class Signal:
         angle_Ubc = phiB - phiC if np.abs(phiB - phiC) < 180 else phiB - phiC - 360 * sign
         angle_Uca = phiC
 
-        self.meas_result.update({angle: val for angle, val in zip(nm_angles, (angle_Uab, angle_Ubc, angle_Uca))})
+        self.meas_result.update(**{angle: val for angle, val in zip(nm_angles, (angle_Uab, angle_Ubc, angle_Uca))})
 
     
     def __calc_phase_current(self):
@@ -134,7 +159,7 @@ class Signal:
         angles = [self.set_harmonics[0].get_phase(name) for name in names_par.get_names_vector()]   # U_phiA, U_phiB, U_phiC, I_phiA, I_phiB, I_phiC 
         cosPhi_angles = (angles[i + 3] - angles[i] for i in range(3))
         nm_angles = names_par.get_measured_cosPhi_names()
-        self.meas_result.update({angle : val * 180/np.pi for angle, val in zip(nm_angles, cosPhi_angles)})
+        self.meas_result.update(**{angle : val * 180/np.pi for angle, val in zip(nm_angles, cosPhi_angles)})
 
     def __convert_to_complex_num(self, vec_val):
         '''
@@ -161,16 +186,13 @@ class Signal:
         # SYM = np.concatenate((U_SYM, I_SYM))
         SYM = np.absolute(np.concatenate((U_SYM, I_SYM)))
         names = names_par.get_measured_sequences_names()
-        self.meas_result.update({seq_vltg : val for seq_vltg, val in zip(names, SYM)})
+        self.meas_result.update(**{seq_vltg : val for seq_vltg, val in zip(names, SYM)})
 
     def __calc_power(self):
         '''
         calc_power - calculates active, reactive, full power
         '''
         
-
- 
-
     def calc_linear_voltage(self, name="Uab"):
         '''
         calc_linear_voltage calcs voltage between two phases. ! Now calc only on main frequency
@@ -185,7 +207,7 @@ class Signal:
         '''
         calc all measurement parameters from signal
         '''
-        self.meas_result["f"] = self.frequency
+        self.meas_result.set_frequency(self.frequency)
         self.__calc_phase_voltage()
         self.__calc_voltage_angles()
         self.__calc_phase_current()
@@ -194,6 +216,19 @@ class Signal:
 
     
 
+class MeasuredSignal:
+    '''
+    MeasuredSignal represents result of measurement Signal. It containes set of parameters defined in names_parameters.names_measured_params
+    '''
+    # measured_params = names_par.names_measured_params it's for optimization
+    def __init__(self):
+        self.results = dict.fromkeys(names_par.names_measured_params, 0)
+    
+    def set_frequency(self, freq):
+        self.results["f"] = freq
+
+    def update(self, **kwargs):
+        self.results.update(kwargs)
 
 
 

@@ -7,7 +7,7 @@ import collections
 import MTE_parameters
 import names_parameters
 import vector_signal as vs
-
+from measurement import make_signal_from_csv_source
 import test_parsing_answer  # clear it in the future
 
 import serial
@@ -63,7 +63,7 @@ def main():
         return     
     # generator_points_dict = collections.OrderedDict()
     set_pnts_for_PSI = create_dict_test_points(sys.argv[1])
-    sig = vs.make_signal_from_csv_source(set_pnts_for_PSI, 132) 
+    sig = make_signal_from_csv_source(set_pnts_for_PSI, 132) 
     sig.calc_measured_param()
     
      

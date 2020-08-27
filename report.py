@@ -1,5 +1,6 @@
 import xlwings as xs
 import time
+import measurement
 
 template_file_name = ".\\Template.xlsx"
 template_range = "A1:AJ8"

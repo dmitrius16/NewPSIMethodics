@@ -12,8 +12,36 @@ import os
 prot = "http://"
 ip_addr = "192.168.99.235"
 
-# may be we don't need this feature
+class RequestBinom():
+    
+    def __init__(self):
+        self.http_addr = "http://" + ip_addr
+    
+    def connect(self):
+        '''
+        connect to binom via http protocol
+        '''       
+        login = {"login" : "root", "password" : "root"}
+        s = requests.Session()
+        request_str = self.http_addr + '/~login'
+        print("Try login to Binom3 " + request_str)
+        try:
+            req = s.post(request_str, params=login)
+            print("Status code: " + str(req.status_code))
+            if req.status_code == 302: #  code mean Found
+                self.session = s
+        except requests.exceptions.RequestException as ex:
+            print(ex)
+
+    def open_channel(self):
+        
+        pass
+
+
+# may be we don't need this feature now it placed in names_parameters
 variable_names = ("P", "Ua", "Ub", "Uc", "AngUab", "AngUbc", "AngUca", "Uab", "Ubc", "Uca", "Ia", "Ib", "Ic", "AngIab", "AngIbc", "AngIca", "AngSym1")
+
+
 
 
 UID_DBnames_mapping = dict()
@@ -37,8 +65,6 @@ def connect_binom():
     req = s.post(request_str, params=login)
     print("Status code: " + str(req.status_code))
     return s
-
-
 
 def ActionsHandler():
 
@@ -151,7 +177,7 @@ def parce_answer_fr_binom(binom_answer):
     '''
     offset_UID = 4
     offset_average_data = 64 + 8
-    global DBNames_value_mapping 
+    # global DBNames_value_mapping  ??? it's exactly need ???
     for _ in range(0, len(variable_names)):
         uid = struct.unpack_from("I", binom_answer, offset_UID)[0]   # get uid from binom data
         value = struct.unpack_from("f", binom_answer, offset_average_data)[0]  # get average value data
