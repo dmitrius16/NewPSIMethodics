@@ -17,7 +17,15 @@ class MeasurementStorage(): # make as singleton!
     def get_mte_signal(self, num_pnt):
         return self.psi_pnts[num_pnt].MTE_signal
 
-
+    def set_binom_measured_signal(self, num_pnt, num_binom=0, **kwarg):
+        '''
+        set measured signal from binom
+        num_pnt - num PSI point 
+        num_binom - no used, reserved for future
+        **kwarg - binom results {Ua: val, Ub: val etc}
+        '''
+        self.psi_pnts[num_pnt].Binom_signals.update(**kwarg)
+        pass
 
 
 # this class inner implementation 

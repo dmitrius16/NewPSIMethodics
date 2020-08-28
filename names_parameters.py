@@ -4,60 +4,6 @@ All names measurement parameters and generator's parameters
 #names_measured_params = ("f","Ua", "Ub", "Uc", "AngUab", "AngUbc", "AngUca", "Ia", "Ib", "Ic", "AngIab", "AngIbc", "AngIca" ,"PFa", "PFb", "PFc", 
 #                       "U1", "U2", "U0", "I1", "I2", "I0", "Pa", "Pb", "Pc", "Qa", "Qb", "Qc", "Sa", "Sb", "Sc", "P", "Q", "S")  #, "P1", "Q1", "S1" ) add in future
 
-names_measured_params = get_measured_vltg_names() + \
-                        get_measured_vltg_angle_names() + \
-                        get_measured_current_names() + \
-                        get_measured_current_angle_names() + \
-                        get_measured_cosPhi_names() + \
-                        get_measured_sequences_names() + \
-                        get_measured_power_names()
-
-def get_measured_vltg_names():
-    #return names_measured_params[1:4]
-    return get_phase_voltage_names()
-
-def get_measured_vltg_angle_names():
-    #return names_measured_params[4:7]  this create new object
-    return ("AngUab", "AngUbc", "AngUca")
-
-def get_measured_current_names():
-    #return names_measured_params[7:10]
-    return get_phase_current_names()
-
-def get_measured_current_angle_names():
-    return  ("AngIab", "AngIbc", "AngIca")
-
-
-def get_measured_cosPhi_names():
-    #return names_measured_params[10:13]
-    return  ("PFa", "PFb", "PFc")
-
-def get_measured_sequences_names():
-    #return names_measured_params[13:19]
-    return ("U1", "U2", "U0", "I1", "I2", "I0")
-
-def get_measured_power_names():
-    #return names_measured_params[19:22]
-    return ("Pa", "Pb", "Pc", "Qa", "Qb", "Qc", "Sa", "Sb", "Sc", "P", "Q", "S")
-
-def get_measured_reactive_power_names():
-    return names_measured_params[22:25]
-
-def get_measured_full_power_names():
-    return names_measured_params[25:28]
-
-def get_measured_active_power_3phase_names():
-    return names_measured_params[28:31]
-
-def get_measured_reactive_power_3phase_names():
-    return names_measured_params[31:34]
-
-def get_measured_full_power_3phase_names():
-    return names_measured_params[34:37]
-
-def get_measured_sequences_power_names():
-    return names_measured_params[37:40]
-
 def get_csv_parameters_names():
     parameter_names = ["Npoint", "time", "F", "Ua", "Ub", "Uc", "Phi_Uab", "Phi_Uac",
                     "Uab", "Ubc", "Uca", "U1", "U2", "U0", "Ia", "Ib", "Ic", "Phi_A",
@@ -136,6 +82,37 @@ def get_phase_current_names():
 
 def get_linear_vltg_names():
     return ("Uab", "Ubc", "Uca")
+
+def get_measured_vltg_names():
+    return get_phase_voltage_names()
+
+def get_measured_vltg_angle_names():
+    return ("AngUab", "AngUbc", "AngUca")
+
+def get_measured_current_names():
+    return get_phase_current_names()
+
+def get_measured_current_angle_names():
+    return  ("AngIab", "AngIbc", "AngIca")
+
+
+def get_measured_cosPhi_names():
+    return  ("PFa", "PFb", "PFc")
+
+def get_measured_sequences_names():
+    return ("U1", "U2", "U0", "I1", "I2", "I0")
+
+def get_measured_power_names():
+    return ("Pa", "Pb", "Pc", "Qa", "Qb", "Qc", "Sa", "Sb", "Sc", "P", "Q", "S")
+
+names_measured_params = ("F",) +  get_measured_vltg_names() + \
+                        get_measured_vltg_angle_names() + \
+                        get_measured_current_names() + \
+                        get_measured_current_angle_names() + \
+                        get_measured_cosPhi_names() + \
+                        get_measured_sequences_names() + \
+                        get_measured_power_names()
+
 
 
 def get_signal_names():

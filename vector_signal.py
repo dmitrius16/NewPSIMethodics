@@ -192,6 +192,7 @@ class Signal:
         '''
         calc_power - calculates active, reactive, full power
         '''
+        pass
         
     def calc_linear_voltage(self, name="Uab"):
         '''
