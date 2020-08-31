@@ -25,7 +25,6 @@ class MeasurementStorage(): # make as singleton!
         **kwarg - binom results {Ua: val, Ub: val etc}
         '''
         self.psi_pnts[num_pnt].Binom_signals.update(**kwarg)
-        pass
 
 
 # this class inner implementation 
