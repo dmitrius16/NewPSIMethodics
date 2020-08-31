@@ -69,6 +69,8 @@ class Signal:
     def set_frequency(self, freq):
         self.frequency = freq
 
+    def get_frequency(self):
+        return self.frequency
 
     def get_vector_interharm(self, num_interharm):
         '''

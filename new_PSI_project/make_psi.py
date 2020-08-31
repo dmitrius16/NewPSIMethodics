@@ -18,7 +18,6 @@ def init():
     
     # open svg channel Binom
     # may be check opend sess and close them via simple socket connection and 23 port    
-    # read csv
     binom_data.connect()    
 
 
