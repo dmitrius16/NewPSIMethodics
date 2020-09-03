@@ -1,6 +1,6 @@
 '''
 Make psi - main module. Set signals on MTE generator and fix result from Binom and MTE. 
-Run as python make_psi.py PSI_Scenariy.py stPnt endPnt
+Run as python make_psi.py PSI_Scenariy.py stPnt endPnt 
 '''
 import sys
 import measurement  
