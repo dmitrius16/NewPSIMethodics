@@ -78,7 +78,7 @@ class RequestBinom():
 
     
     def __close_svg_channel(self):
-        if self.channel_open = True:
+        if self.channel_open == True:
             request = "~svgclose?name=db:PSI_data"
             if hasattr(self, "session"):
                 r = self.session.get(self.__create_request(request))

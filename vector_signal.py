@@ -195,13 +195,15 @@ class Signal:
         # SYM = np.concatenate((U_SYM, I_SYM))
         SYM = np.absolute(np.concatenate((U_SYM, I_SYM)))
         names = names_par.get_measured_sequences_names()
-        self.meas_result.update(**{seq_vltg : val for seq_vltg, val in zip(names, SYM)})
+        self.meas_result.update(**{seq_vltg : val[0] for seq_vltg, val in zip(names, SYM)})
 
     def __calc_power(self):
         '''
         calc_power - calculates active, reactive, full power
         '''
+
         pass
+
         
     def calc_linear_voltage(self, name="Uab"):
         '''
@@ -228,14 +230,14 @@ class Signal:
 
 class MeasuredSignal:
     '''
-    MeasuredSignal represents result of measurement Signal. It containes set of parameters defined in names_parameters.names_measured_params
+    MeasuredSignal represents result of measurement Signal. It contains set of parameters defined in names_parameters.names_measured_params
     '''
     # measured_params = names_par.names_measured_params it's for optimization
     def __init__(self):
         self.results = dict.fromkeys(names_par.names_measured_params, 0)
     
     def set_frequency(self, freq):
-        self.results["f"] = freq
+        self.results["F"] = freq
 
     def update(self, **kwargs):
         self.results.update(kwargs)

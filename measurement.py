@@ -1,8 +1,23 @@
 import vector_signal as vs
 import names_parameters as names_par
+import collections
+import csv
 
+def create_dict_test_points(csv_file_name):
+    """
+    Read csv line by line and create dict of points
+    """
+    csv_dict = collections.OrderedDict()
+    with(open(csv_file_name, 'r')) as csv_file:
+        reader = csv.DictReader(csv_file, fieldnames = names_par.get_csv_parameters_names(), delimiter=";")
+        for num_pnt, pnt_param in enumerate(reader):
+            pnt_param = {k:v.replace(",", ".") if type(v) == str else v for k, v in pnt_param.items()}
+            csv_dict[num_pnt + 1] = pnt_param
 
-
+    # here make measurement signal
+    for num_pnt in range(1, 156):
+        make_signal_from_csv_source(csv_dict, num_pnt)
+   
 class MeasurementStorage(): # make as singleton!
     def __init__(self):
         self.psi_pnts = []
@@ -12,10 +27,21 @@ class MeasurementStorage(): # make as singleton!
             self.psi_pnts.append(PSIPointMesurement(i, etalon, mte))
 
     def get_etalon_signal(self, num_pnt):
-        return self.psi_pnts[num_pnt].etalon_signal
+        '''
+        Return etalon signal(Signal from scenariy.csv) from measurement storage
+        num_pnt - number of point start form: 1, end: 156
+        '''
+        return self.psi_pnts[num_pnt - 1].etalon_signal
 
     def get_mte_signal(self, num_pnt):
-        return self.psi_pnts[num_pnt].MTE_signal
+        '''
+        Return mte signal(Signal measured by MTE)
+        num_pnt - number of point start from: 1, end: 156
+        '''
+        return self.psi_pnts[num_pnt - 1].MTE_signal
+
+    def set_etalon_measured_signal(self, ):
+        pass
 
     def set_binom_measured_signal(self, num_pnt, num_binom=0, **kwarg):
         '''
@@ -24,7 +50,7 @@ class MeasurementStorage(): # make as singleton!
         num_binom - no used, reserved for future
         **kwarg - binom results {Ua: val, Ub: val etc}
         '''
-        self.psi_pnts[num_pnt].Binom_signals.update(**kwarg)
+        self.psi_pnts[num_pnt - 1].Binom_signals.update(**kwarg)
     
     def set_mte_measured_signal(self, num_pnt, meas_vals):
         '''
@@ -32,7 +58,7 @@ class MeasurementStorage(): # make as singleton!
         num_pnt - number point 
         result - (Ua, phaseUa),....(Ic, phaseIc)
         '''
-        mte_signal = self.get_mte_signal(num_pnt)
+        mte_signal = self.get_mte_signal(num_pnt)  # no need num_pnt - 1, get_mte_signal makes it 
         main_freq_vec = mte_signal.get_main_freq_vector()
         main_freq_vec.update(meas_vals)
 
@@ -99,7 +125,9 @@ def make_signal_from_csv_source(txt_par_dict, num_pnt):
             harm.set(name, nominals[3 + ind] * percent_ii / 100, 0)
         # signal.add_interharm(names_par.get_num_harm(ui_name), harm)
     
-    return signal
+    signal.calc_measured_param()
+    
+    # return signal
      
 measurement_storage = MeasurementStorage()
 

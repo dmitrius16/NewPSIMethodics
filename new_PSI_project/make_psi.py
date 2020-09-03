@@ -18,7 +18,9 @@ def init():
     
     # open svg channel Binom
     # may be check opend sess and close them via simple socket connection and 23 port    
-    binom_data.connect()    
+    # read csv
+    #  binom_data.connect()     uncoment it!!!!
+    measurement.create_dict_test_points(sys.argv[1])
 
 
 
