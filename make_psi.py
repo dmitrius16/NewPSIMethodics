@@ -6,6 +6,9 @@ import sys
 import measurement  
 import svgrequest 
 import time
+import report
+import fictive_measurement  #it's debug clear it
+
 
 binom_data = svgrequest.RequestBinom()
 
@@ -35,9 +38,15 @@ def main():
     # parce argv
     if len(sys.argv) < 4:
         print("Need more command arguments, example Scenariy.csv stpnt endpnt")
-    
-    st_pnt = int(sys.argv[2]) - 1
-    end_pnt = int(sys.argv[3]) - 1
+
+    st_pnt = int(sys.argv[2])   
+    end_pnt = int(sys.argv[3])   
+
+    # for debug purposes clear all before end debug procecc string
+    measurement.create_dict_test_points(sys.argv[1]) 
+    report.generate_report(st_pnt, end_pnt)
+    # end debug purposes
+
 
     if not check_pnts(st_pnt, end_pnt):
         return
@@ -56,12 +65,13 @@ def main():
         #5 Read data from Binom
         #6 pause
         
-            for _ in range(2):
-                binom_data.read_data(cur_pnt)
+            # for _ in range(2):
+            binom_data.read_data(cur_pnt)
                 # time.sleep(5)
-            
+
             cur_pnt+=1
 
+        report.generate_report(st_pnt, end_pnt)  # real place generate report
         print("Ask finished")
     except Exception as ex:
         print("Exception occur:", ex)
