@@ -96,6 +96,8 @@ def __write_meas_errors(wb_result, cur_pnt, meas_result, offset):
     '''
     cur_range = wb_result.sheets[0].range(cur_col_output).offset(offset[0], offset[1])
     cur_range = cur_range.offset(1, 1)
+    # very slow speed below code
+    '''
     for num, meas_par_name in enumerate(nm_par.link_measured_params_errors.keys()):
         type_tolerance = nm_par.link_measured_params_errors[meas_par_name]
         #  cur_range = cur_range.offset(0, num)
@@ -108,8 +110,13 @@ def __write_meas_errors(wb_result, cur_pnt, meas_result, offset):
                 cur_range.offset(row, num).value = meas_result.errors[meas_par_name] 
             else:
                 cur_range.offset(row, num).value = "-----"
-
-
+    '''
+    # for num, meas_par_name in enumerate(nm_par.link_measured_params_errors.keys()):
+    for nm_err in ("absolute", "relative", "reduced"):
+        err = [meas_result.errors[name] if type_tolerance == nm_err else "-----"  for name, type_tolerance in nm_par.link_measured_params_errors.items()]
+        cur_range.value = err
+        cur_range = cur_range.offset(1, 0)
+    
     
 def write_etalon_result(wb_result, cur_pnt):
     etalon = measurement.measurement_storage.get_etalon_signal(cur_pnt)
@@ -133,7 +140,7 @@ def generate_report(st_pnt, end_pnt):
     
     # 3. copy results part for Binom
     # 4. copy results
-    res_excel_file =  '.\\Reports\\Report_' + time.strftime("%Y_%m_%d:%H:%M:%S",time.localtime()) + ".xlsx"
+    res_excel_file =  '.\\Results\\Report_' + time.strftime("%Y_%m_%d-%H-%M-%S",time.localtime()) + ".xlsx"
     
     # excel_app = xs.App(visible=False)  #uncomment if visible not desired
   
