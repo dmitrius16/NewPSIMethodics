@@ -166,9 +166,9 @@ class Signal:
         calc_cos_phi - calc cos phi * (between U and I)
         '''
         angles = [self.set_harmonics[0].get_phase(name) for name in names_par.get_names_vector()]   # U_phiA, U_phiB, U_phiC, I_phiA, I_phiB, I_phiC 
-        cosPhi_angles = (angles[i + 3] - angles[i] for i in range(3))
+        cosPhi_angles = [angles[i + 3] - angles[i] for i in range(3)]
         nm_angles = names_par.get_measured_cosPhi_names()
-        self.meas_result.update(**{angle : val * 180/np.pi for angle, val in zip(nm_angles, cosPhi_angles)})
+        self.meas_result.update(**{angle : np.cos(np.deg2rad(val)) for angle, val in zip(nm_angles, cosPhi_angles)})
 
     def __convert_to_complex_num(self, vec_val):
         '''
